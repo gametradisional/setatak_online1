@@ -306,7 +306,7 @@
 
 /* === Tambahan untuk html agar scrollbar selalu muncul === */
 html {
-    overflow-y: scroll;   /* paksa scrollbar vertikal muncul */
+    overflow-y: auto;   /* paksa scrollbar vertikal muncul */
     scrollbar-width: thin; /* Firefox */
     scrollbar-color: #888 #f0f0f0; /* Warna scrollbar */
 }
@@ -325,7 +325,7 @@ html::-webkit-scrollbar-track {
 
 /* Scrollbar untuk body */
 body {
-    overflow-y: scroll; /* Selalu tampilkan scrollbar vertikal */
+    overflow-y: auto; /* Selalu tampilkan scrollbar vertikal */
     scrollbar-width: thin; /* Untuk Firefox */
     scrollbar-color: #888 #f0f0f0; /* Warna scrollbar (thumb dan track) */
 }
