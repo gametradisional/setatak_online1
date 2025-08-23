@@ -644,40 +644,28 @@ const extraQuestions5 = [
 ];
 
 function generateLevel1Question() {
-// cek apakah soal tambahan keluar
-const r = Math.random();
+  const r = Math.random();
 
-// soal gambar
-if (r < 0.3) {
-  const q = questionsWithImages[Math.floor(Math.random() * questionsWithImages.length)];
-  return {
-    question: q.question,
-    answer: q.answer,
-    image: q.image
-  };
-}
+  // 30% soal gambar
+  if (r < 0.3) {
+    const q = questionsWithImages[Math.floor(Math.random() * questionsWithImages.length)];
+    return { question: q.question, answer: q.answer, image: q.image, isDummy: true };
+  }
 
-// soal tambahan (array extraQuestions kamu)
-if (r < 0.3) {
-  const q = extraQuestions1[Math.floor(Math.random() * extraQuestions1.length)];
-  return {
-    question: q.question,
-    answer: q.answer
-  };
-}
-// default soal aritmatika level 1
-while (true) {
-  const x = randInt(1, 9);
-  const y = randInt(1, 9);
-  const z = randInt(1, 9);
-  const ops = [
-    Math.random() < 0.5 ? '+' : '-',
-    Math.random() < 0.5 ? '+' : '-'
-  ];
-  const expr = `${x} ${ops[0]} ${y} ${ops[1]} ${z}`;
-  const val = eval(expr);
-  if (val >= 0) return { question: expr, answer: val.toString() };
-}
+  // 30% soal tambahan (kalau mau persis 30%, ubah ke: else if (r < 0.6))
+  if (r < 0.6) {
+    const q = extraQuestions1[Math.floor(Math.random() * extraQuestions1.length)];
+    return { question: q.question, answer: q.answer, isDummy: true };
+  }
+
+  // default aritmatika level 1
+  while (true) {
+    const x = randInt(1, 9), y = randInt(1, 9), z = randInt(1, 9);
+    const ops = [Math.random() < 0.5 ? '+' : '-', Math.random() < 0.5 ? '+' : '-'];
+    const expr = `${x} ${ops[0]} ${y} ${ops[1]} ${z}`;
+    const val = eval(expr);
+    if (val >= 0) return { question: expr, answer: String(val), isDummy: false };
+  }
 }
 
 
@@ -729,27 +717,18 @@ function evalWithPrecedence(expr) {
 // ==========================
 function generateLevel2Question() {
   if (Math.random() < 0.6 && extraQuestions2 && extraQuestions2.length > 0) {
-    return extraQuestions2[Math.floor(Math.random() * extraQuestions2.length)];
+    const q = extraQuestions2[Math.floor(Math.random() * extraQuestions2.length)];
+    return { question: q.question, answer: q.answer, isDummy: true };
   }
-
   while (true) {
-    let x = randInt(1, 6);
-    let y = randInt(1, 6);
-    let z = randInt(1, 6);
+    const x = randInt(1, 6), y = randInt(1, 6), z = randInt(1, 6);
     const ops = ['+', '-', '×', '÷'];
-    let op1 = ops[randInt(0, ops.length - 1)];
-    let op2 = ops[randInt(0, ops.length - 1)];
-
+    const op1 = ops[randInt(0, ops.length - 1)];
+    const op2 = ops[randInt(0, ops.length - 1)];
     const expr = `${x} ${op1} ${y} ${op2} ${z}`;
-    let result = evalWithPrecedence(expr);
-
-    if (
-      result !== null &&
-      isFinite(result) &&
-      Number.isInteger(result) &&
-      result >= 0
-    ) {
-      return { question: `${expr} = ?`, answer: String(result) };
+    const result = evalWithPrecedence(expr);
+    if (result !== null && isFinite(result) && Number.isInteger(result) && result >= 0) {
+      return { question: `${expr} = ?`, answer: String(result), isDummy: false };
     }
   }
 }
@@ -759,29 +738,19 @@ function generateLevel2Question() {
 // ==========================
 function generateLevel3Question() {
   if (Math.random() < 0.6 && extraQuestions3 && extraQuestions3.length > 0) {
-    return extraQuestions3[Math.floor(Math.random() * extraQuestions3.length)];
+    const q = extraQuestions3[Math.floor(Math.random() * extraQuestions3.length)];
+    return { question: q.question, answer: q.answer, isDummy: true };
   }
-
   while (true) {
-    let a = randInt(1, 6);
-    let b = randInt(1, 6);
-    let c = randInt(1, 6);
-    let d = randInt(1, 6);
+    const a = randInt(1, 6), b = randInt(1, 6), c = randInt(1, 6), d = randInt(1, 6);
     const ops = ['+', '-', '×', '÷'];
-    let op1 = ops[randInt(0, ops.length - 1)];
-    let op2 = ops[randInt(0, ops.length - 1)];
-    let op3 = ops[randInt(0, ops.length - 1)];
-
+    const op1 = ops[randInt(0, ops.length - 1)];
+    const op2 = ops[randInt(0, ops.length - 1)];
+    const op3 = ops[randInt(0, ops.length - 1)];
     const expr = `${a} ${op1} ${b} ${op2} ${c} ${op3} ${d}`;
-    let result = evalWithPrecedence(expr);
-
-    if (
-      result !== null &&
-      isFinite(result) &&
-      Number.isInteger(result) &&
-      result >= 0
-    ) {
-      return { question: `${expr} = ?`, answer: String(result) };
+    const result = evalWithPrecedence(expr);
+    if (result !== null && isFinite(result) && Number.isInteger(result) && result >= 0) {
+      return { question: `${expr} = ?`, answer: String(result), isDummy: false };
     }
   }
 }
@@ -791,31 +760,20 @@ function generateLevel3Question() {
 // ==========================
 function generateLevel4Question() {
   if (Math.random() < 0.6 && extraQuestions4 && extraQuestions4.length > 0) {
-    return extraQuestions4[Math.floor(Math.random() * extraQuestions4.length)];
+    const q = extraQuestions4[Math.floor(Math.random() * extraQuestions4.length)];
+    return { question: q.question, answer: q.answer, isDummy: true };
   }
-
   while (true) {
-    let a = randInt(1, 6);
-    let b = randInt(1, 6);
-    let c = randInt(1, 6);
-    let d = randInt(1, 6);
-    let e = randInt(1, 6);
+    const a = randInt(1, 6), b = randInt(1, 6), c = randInt(1, 6), d = randInt(1, 6), e = randInt(1, 6);
     const ops = ['+', '-', '×', '÷'];
-    let op1 = ops[randInt(0, ops.length - 1)];
-    let op2 = ops[randInt(0, ops.length - 1)];
-    let op3 = ops[randInt(0, ops.length - 1)];
-    let op4 = ops[randInt(0, ops.length - 1)];
-
+    const op1 = ops[randInt(0, ops.length - 1)];
+    const op2 = ops[randInt(0, ops.length - 1)];
+    const op3 = ops[randInt(0, ops.length - 1)];
+    const op4 = ops[randInt(0, ops.length - 1)];
     const expr = `${a} ${op1} ${b} ${op2} ${c} ${op3} ${d} ${op4} ${e}`;
-    let result = evalWithPrecedence(expr);
-
-    if (
-      result !== null &&
-      isFinite(result) &&
-      Number.isInteger(result) &&
-      result >= 0
-    ) {
-      return { question: `${expr} = ?`, answer: String(result) };
+    const result = evalWithPrecedence(expr);
+    if (result !== null && isFinite(result) && Number.isInteger(result) && result >= 0) {
+      return { question: `${expr} = ?`, answer: String(result), isDummy: false };
     }
   }
 }
@@ -825,33 +783,21 @@ function generateLevel4Question() {
 // ==========================
 function generateLevel5Question() {
   if (Math.random() < 0.6 && extraQuestions5 && extraQuestions5.length > 0) {
-    return extraQuestions5[Math.floor(Math.random() * extraQuestions5.length)];
+    const q = extraQuestions5[Math.floor(Math.random() * extraQuestions5.length)];
+    return { question: q.question, answer: q.answer, isDummy: true };
   }
-
   while (true) {
-    let a = randInt(1, 6);
-    let b = randInt(1, 6);
-    let c = randInt(1, 6);
-    let d = randInt(1, 6);
-    let e = randInt(1, 6);
-    let f = randInt(1, 6);
+    const a = randInt(1, 6), b = randInt(1, 6), c = randInt(1, 6), d = randInt(1, 6), e = randInt(1, 6), f = randInt(1, 6);
     const ops = ['+', '-', '×', '÷'];
-    let op1 = ops[randInt(0, ops.length - 1)];
-    let op2 = ops[randInt(0, ops.length - 1)];
-    let op3 = ops[randInt(0, ops.length - 1)];
-    let op4 = ops[randInt(0, ops.length - 1)];
-    let op5 = ops[randInt(0, ops.length - 1)];
-
+    const op1 = ops[randInt(0, ops.length - 1)];
+    const op2 = ops[randInt(0, ops.length - 1)];
+    const op3 = ops[randInt(0, ops.length - 1)];
+    const op4 = ops[randInt(0, ops.length - 1)];
+    const op5 = ops[randInt(0, ops.length - 1)];
     const expr = `${a} ${op1} ${b} ${op2} ${c} ${op3} ${d} ${op4} ${e} ${op5} ${f}`;
-    let result = evalWithPrecedence(expr);
-
-    if (
-      result !== null &&
-      isFinite(result) &&
-      Number.isInteger(result) &&
-      result >= 0
-    ) {
-      return { question: `${expr} = ?`, answer: String(result) };
+    const result = evalWithPrecedence(expr);
+    if (result !== null && isFinite(result) && Number.isInteger(result) && result >= 0) {
+      return { question: `${expr} = ?`, answer: String(result), isDummy: false };
     }
   }
 }
@@ -882,7 +828,8 @@ let countdownInterval = null;
 function showMathQuestion() {
   const q = generateMathQuestion();
   gameState.currentQuestion = q.question;
-  gameState.currentAnswer = q.answer;
+  gameState.currentAnswer  = q.answer;
+  gameState.currentIsDummy = !!q.isDummy;
 
   // tampilkan teks soal
   document.getElementById('mathQuestion').textContent = q.question;
@@ -935,16 +882,34 @@ function playSound(id) {
   }
 }
 
-  function checkAnswer() {
+// Normalisasi jawaban teks: trim, lowercase, hilangkan aksen/diakritik, rapikan spasi
+
+  // === Helper untuk normalisasi jawaban teks ===
+// === Helper untuk normalisasi jawaban teks ===
+function normalizeAnswerStr(s) {
+    return String(s)
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // hapus aksen
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, ' '); // rapikan spasi ganda
+}
+
+function isTextCorrect(input, correct) {
+    if (Array.isArray(correct)) {
+        return correct.some(ans => normalizeAnswerStr(input) === normalizeAnswerStr(ans));
+    }
+    return normalizeAnswerStr(input) === normalizeAnswerStr(correct);
+}
+
+function checkAnswer() {
     clearTimers();
     const input = document.getElementById('mathAnswer').value.trim();
     const fb = document.getElementById('answerFeedback');
     const correct = gameState.currentAnswer;
-    const isDummy = gameState.currentIsDummy || false; // tandai soal dummy / random
+    const isDummy = gameState.currentIsDummy || false;
 
-    // --- Soal dari data dummy ---
     if (isDummy) {
-        // angka
+        // === ANGKA ===
         if (!isNaN(correct)) {
             const val = Number(input);
             if (isNaN(val)) {
@@ -954,7 +919,7 @@ function playSound(id) {
                 return;
             }
 
-            if (Math.abs(val - Number(correct)) < 1e-6) {
+            if (val === Number(correct)) {
                 // ✅ BENAR
                 fb.textContent = '✅ Benar!';
                 fb.className = 'mt-6 text-center font-bold text-lg text-green-600';
@@ -980,9 +945,10 @@ function playSound(id) {
                 }, 1500);
             }
         }
-        // teks
+        // === TEKS ===
         else {
-            if (input.toLowerCase() === String(correct).toLowerCase()) {
+            if (isTextCorrect(input, correct)) {
+                // ✅ BENAR
                 fb.textContent = '✅ Benar!';
                 fb.className = 'mt-6 text-center font-bold text-lg text-green-600';
                 fb.classList.remove('hidden');
@@ -995,6 +961,7 @@ function playSound(id) {
                     }, 1000);
                 }, 1000);
             } else {
+                // ❌ SALAH
                 fb.textContent = `❌ Salah! Jawaban: ${correct}`;
                 fb.className = 'mt-6 text-center font-bold text-lg text-red-600';
                 fb.classList.remove('hidden');
@@ -1007,8 +974,7 @@ function playSound(id) {
             }
         }
     }
-
-    // --- Soal random operasi (x op1 y op2 z) ---
+    // === SOAL RANDOM OPERASI ===
     else {
         if (input === "") {
             fb.textContent = '❌ Jawaban tidak boleh kosong!';
