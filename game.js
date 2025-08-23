@@ -903,39 +903,29 @@ function isTextCorrect(input, correct) {
 
 function checkAnswer() {
     clearTimers();
-    const input = document.getElementById('mathAnswer').value.trim();
-    const fb = document.getElementById('answerFeedback');
+    const input   = document.getElementById('mathAnswer').value.trim();
+    const fb      = document.getElementById('answerFeedback');
     const correct = gameState.currentAnswer;
     const isDummy = gameState.currentIsDummy || false;
 
     if (isDummy) {
         // === ANGKA ===
         if (!isNaN(correct)) {
-            const val = Number(input);
-            if (isNaN(val)) {
-                fb.textContent = 'Masukkan angka yang valid!';
-                fb.className = 'mt-6 text-center font-bold text-lg text-red-600';
-                fb.classList.remove('hidden');
-                return;
-            }
-
-            if (val === Number(correct)) {
+            if (input == correct) {
                 // ✅ BENAR
                 fb.textContent = '✅ Benar!';
-                fb.className = 'mt-6 text-center font-bold text-lg text-green-600';
+                fb.className   = 'mt-6 text-center font-bold text-lg text-green-600';
                 fb.classList.remove('hidden');
                 playSound("sound-correct");
 
                 setTimeout(() => {
                     closeMathModal();       
-                    setTimeout(() => {
-                        moveCurrentPlayer(); 
-                    }, 1000);
+                    setTimeout(() => moveCurrentPlayer(), 1000);
                 }, 1000);
             } else {
-                // ❌ SALAH
+                // ❌ SALAH (apapun isi input selain jawaban benar)
                 fb.textContent = `❌ Salah! Jawaban: ${correct}`;
-                fb.className = 'mt-6 text-center font-bold text-lg text-red-600';
+                fb.className   = 'mt-6 text-center font-bold text-lg text-red-600';
                 fb.classList.remove('hidden');
                 playSound("sound-wrong");
 
@@ -948,22 +938,18 @@ function checkAnswer() {
         // === TEKS ===
         else {
             if (isTextCorrect(input, correct)) {
-                // ✅ BENAR
                 fb.textContent = '✅ Benar!';
-                fb.className = 'mt-6 text-center font-bold text-lg text-green-600';
+                fb.className   = 'mt-6 text-center font-bold text-lg text-green-600';
                 fb.classList.remove('hidden');
                 playSound("sound-correct");
 
                 setTimeout(() => {
                     closeMathModal();
-                    setTimeout(() => {
-                        moveCurrentPlayer();
-                    }, 1000);
+                    setTimeout(() => moveCurrentPlayer(), 1000);
                 }, 1000);
             } else {
-                // ❌ SALAH
                 fb.textContent = `❌ Salah! Jawaban: ${correct}`;
-                fb.className = 'mt-6 text-center font-bold text-lg text-red-600';
+                fb.className   = 'mt-6 text-center font-bold text-lg text-red-600';
                 fb.classList.remove('hidden');
                 playSound("sound-wrong");
 
@@ -978,7 +964,7 @@ function checkAnswer() {
     else {
         if (input === "") {
             fb.textContent = '❌ Jawaban tidak boleh kosong!';
-            fb.className = 'mt-6 text-center font-bold text-lg text-red-600';
+            fb.className   = 'mt-6 text-center font-bold text-lg text-red-600';
             fb.classList.remove('hidden');
             playSound("sound-wrong");
 
@@ -991,19 +977,17 @@ function checkAnswer() {
 
         if (input == correct) {
             fb.textContent = '✅ Benar!';
-            fb.className = 'mt-6 text-center font-bold text-lg text-green-600';
+            fb.className   = 'mt-6 text-center font-bold text-lg text-green-600';
             fb.classList.remove('hidden');
             playSound("sound-correct");
 
             setTimeout(() => {
                 closeMathModal();
-                setTimeout(() => {
-                    moveCurrentPlayer();
-                }, 1000);
+                setTimeout(() => moveCurrentPlayer(), 1000);
             }, 1000);
         } else {
             fb.textContent = `❌ Salah! Jawaban: ${correct}`;
-            fb.className = 'mt-6 text-center font-bold text-lg text-red-600';
+            fb.className   = 'mt-6 text-center font-bold text-lg text-red-600';
             fb.classList.remove('hidden');
             playSound("sound-wrong");
 
@@ -1014,7 +998,6 @@ function checkAnswer() {
         }
     }
 }
-
 
 function showTimeoutThenNext(){
   const fb = document.getElementById('answerFeedback');
