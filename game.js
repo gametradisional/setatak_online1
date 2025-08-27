@@ -10,6 +10,9 @@
  */
 
 // Pilihan emoji yang tersedia untuk pemain
+// === Soal unik per level ===
+const usedQuestions = { 1: new Set(), 2: new Set(), 3: new Set(), 4: new Set(), 5: new Set() };
+const MAX_UNIQUE_TRIES = 50; // batas percobaan cari soal unik
 const availableEmojis = [ 
   // existing
   '🚀', '⭐️', '⚡️', '❤️', '🎉', '🌟', 
@@ -296,8 +299,24 @@ function selectLevel(level) {
   modal.classList.add('flex');
 }
 
+let availableQuestions = {
+  1: [],
+  2: [],
+  3: [],
+  4: [],
+  5: []
+};
+
+// 🔹 Reset pool soal ketika pertandingan baru dimulai
 function startLevelAfterRules() {
   const level = gameState.pendingLevel;
+
+  // ✅ PENTING: set level aktif utk router generateMathQuestion
+  gameState.level = level;
+
+  // ✅ Reset daftar soal yang sudah pernah muncul di level ini
+  if (!usedQuestions[level]) usedQuestions[level] = new Set();
+  usedQuestions[level].clear();
 
   // tutup modal aturan
   const modal = document.getElementById('rulesModal');
@@ -425,7 +444,27 @@ const extraQuestions1 = [
 { question: "Satu tahun ada berapa bulan?", answer: "12" },
 { question: "Hari ini Jumat, 5 hari kemudian hari apa?", answer: "Rabu" },
 { question: "Mana yang lebih besar, 8 atau 12?", answer: "12" },
-{ question: "Mana yang lebih kecil, 7 atau 9?", answer: "7" }
+{ question: "Mana yang lebih kecil, 7 atau 9?", answer: "7" },
+{ question: "Doni punya 4 permen, diberi 6 permen lagi. Total permen Doni?", answer: "10" },
+{ question: "Lina punya 10 kue, dimakan 3. Sisa kue Lina?", answer: "7" },
+{ question: "Sekarang pukul 2 siang. 4 jam lagi pukul berapa?", answer: "6" },
+{ question: "Panjang buku 20 cm, panjang bolpoin 10 cm. Mana lebih panjang?", answer: "buku" },
+{ question: "Satu hari ada berapa jam?", answer: "24" },
+{ question: "Berat 2 kg lebih besar dari 1 kg? (ya/tidak)", answer: "ya" },
+{ question: "Jam menunjukkan pukul 11. Dua jam sebelumnya jam berapa?", answer: "9" },
+{ question: "Hari ini Rabu, 2 hari lagi hari apa?", answer: "Jumat" },
+{ question: "Jika Ani punya 8 kelereng dan hilang 2, berapa sisanya?", answer: "6" },
+{ question: "Mana yang lebih besar, 15 atau 20?", answer: "20" },
+{ question: "Mana yang lebih kecil, 18 atau 25?", answer: "18" },
+{ question: "Sekarang jam 6 pagi. 6 jam lagi jam berapa?", answer: "12" },
+{ question: "Satu lusin telur ada berapa butir?", answer: "12" },
+{ question: "Hari ini Minggu, besok hari apa?", answer: "Senin" },
+{ question: "5 + 7 = ?", answer: "12" },
+{ question: "10 – 6 = ?", answer: "4" },
+{ question: "3 × 2 = ?", answer: "6" },
+{ question: "8 ÷ 2 = ?", answer: "4" },
+{ question: "Mana yang lebih berat, sapi atau ayam?", answer: "sapi" },
+{ question: "Jika sekarang jam 1 siang, 5 jam lagi jam berapa?", answer: "6" }
 ];
 
 const questionsWithImages = [
@@ -462,185 +501,213 @@ const questionsWithImages = [
 ];
 
 const extraQuestions2 = [
-  // Warna & benda sehari-hari
-  { question: "Apel berwarna merah. Apakah benar? (ya/tidak)", answer: "ya" },
-  { question: "Pisang berwarna biru. Apakah benar? (ya/tidak)", answer: "tidak" },
-  { question: "Langit siang hari biasanya berwarna biru. Apakah benar? (ya/tidak)", answer: "ya" },
-  { question: "Air laut rasanya manis. Apakah benar? (ya/tidak)", answer: "tidak" },
-  { question: "Semangka punya biji. Apakah benar? (ya/tidak)", answer: "ya" },
-
-  // Hitungan kecil
-  { question: "12 x 3 = ?", answer: "36" },
-  { question: "11 x 2 = ?", answer: "22" },
-  { question: "12 x 5 = ?", answer: "60" },
-  { question: "100 - 6 = ?", answer: "94" },
-  { question: "80 + 13 = ?", answer: "93" },
-
-  // Logika jumlah
-  { question: "Ada 4 kucing. 1 pergi. Sisa kucing berapa?", answer: "3" },
-  { question: "Ada 6 ayam dan 2 bebek. Jumlah semua hewan?", answer: "8" },
-  { question: "Ani punya 5 permen. Ia makan 2. Sisa permen Ani?", answer: "3" },
-  { question: "Ali punya 3 buku, Budi punya 2 buku. Jumlah buku mereka?", answer: "5" },
-  { question: "Jika ada 10 kursi dan 8 anak duduk, berapa kursi kosong?", answer: "2" },
-
-  // Urutan & pola sederhana
-  { question: "Urutan angka: 1, 2, 3, ... angka berikutnya?", answer: "4" },
-  { question: "Urutan angka: 2, 4, 6, ... angka berikutnya?", answer: "8" },
-  { question: "Urutan angka: 5, 6, 7, ... angka berikutnya?", answer: "8" },
-  { question: "Urutan huruf: A, B, C, ... huruf berikutnya?", answer: "D" },
-  { question: "Urutan huruf: X, Y, Z, ... huruf berikutnya?", answer: "A" },
-
-  // Logika benar/salah sederhana
-  { question: "Matahari terbit dari timur. Apakah benar? (ya/tidak)", answer: "ya" },
-  { question: "Air panas lebih dingin dari es. Apakah benar? (ya/tidak)", answer: "tidak" },
-  { question: "Seekor ikan bisa berenang. Apakah benar? (ya/tidak)", answer: "ya" },
-  { question: "Seekor burung bisa terbang. Apakah benar? (ya/tidak)", answer: "ya" },
-  { question: "Sepeda punya 3 roda. Apakah benar? (ya/tidak)", answer: "tidak" },
-
-  // Perbandingan mudah
-  { question: "Manakah yang lebih besar: 12 atau 8?", answer: "12" },
-  { question: "Manakah yang lebih kecil: 3 atau 9?", answer: "3" },
-  { question: "Apakah 6 lebih besar dari 5? (ya/tidak)", answer: "ya" },
-  { question: "Apakah 2 lebih kecil dari 1? (ya/tidak)", answer: "tidak" },
-  { question: "Manakah yang lebih banyak: 7 kue atau 5 kue?", answer: "7" }
+    { question: "12 + 15 = ?", answer: "27" },
+    { question: "25 – 9 = ?", answer: "16" },
+    { question: "7 × 3 = ?", answer: "21" },
+    { question: "18 ÷ 3 = ?", answer: "6" },
+    { question: "9 × 4 = ?", answer: "36" },
+    { question: "28 – 12 = ?", answer: "16" },
+    { question: "33 + 25 = ?", answer: "58" },
+    { question: "45 ÷ 5 = ?", answer: "9" },
+    { question: "19 + 21 = ?", answer: "40" },
+    { question: "50 – 28 = ?", answer: "22" },
+    { question: "123 ... 213", answer: "<" },
+    { question: "345 ... 354", answer: "<" },
+    { question: "276 ... 267", answer: ">" },
+    { question: "498 ... 489", answer: ">" },
+    { question: "512 ... 521", answer: "<" },
+    { question: "630 ... 603", answer: ">" },
+    { question: "714 ... 741", answer: "<" },
+    { question: "865 ... 856", answer: ">" },
+    { question: "999 ... 990", answer: ">" },
+    { question: "150 ... 105", answer: ">" },
+    { question: "Jika ada 10 kursi dan 8 anak duduk, berapa kursi kosong?", answer: "2" },
+    { question: "15 + 14 = ?", answer: "29" },
+    { question: "35 – 17 = ?", answer: "18" },
+    { question: "6 × 5 = ?", answer: "30" },
+    { question: "40 ÷ 8 = ?", answer: "5" },
+    { question: "300 ... 290", answer: ">" },
+    { question: "210 ... 201", answer: ">" },
+    { question: "412 ... 421", answer: "<" },
+    { question: "509 ... 599", answer: "<" },
+    { question: "701 ... 710", answer: "<" },
+    { question: "25 + 18 = ?", answer: "43" },
+    { question: "90 – 45 = ?", answer: "45" },
+    { question: "11 × 3 = ?", answer: "33" },
+    { question: "63 ÷ 9 = ?", answer: "7" },
+    { question: "Jika ada 12 kelereng, diambil 5, sisa?", answer: "7" },
+    { question: "800 ... 899", answer: "<" },
+    { question: "321 ... 231", answer: ">" },
+    { question: "654 ... 645", answer: ">" },
+    { question: "333 ... 303", answer: ">" },
+    { question: "275 ... 752", answer: "<" },
+    { question: "20 + 30 = ?", answer: "50" },
+    { question: "45 – 28 = ?", answer: "17" },
+    { question: "9 × 8 = ?", answer: "72" },
+    { question: "72 ÷ 8 = ?", answer: "9" },
+    { question: "Jika ibu punya 5 apel, ayah memberi 4 apel lagi, total?", answer: "9" },
+    { question: "200 ... 199", answer: ">" },
+    { question: "888 ... 889", answer: "<" },
+    { question: "456 ... 654", answer: "<" },
+    { question: "999 ... 100", answer: ">" },
+    { question: "123 ... 321", answer: "<" }
 ];
 
 const extraQuestions3 = [
-{ question: "Lanjutkan pola: 2, 4, 6, 8, ...", answer: "10" },
-{ question: "Lanjutkan pola: 1, 2, 3, 4, ...", answer: "5" },
-{ question: "Lanjutkan pola: 1, 3, 5, 7, ...", answer: "9" },
-{ question: "Lanjutkan pola: 2, 3, 5, 7, ...", answer: "11" },
-{ question: "Lanjutkan pola: 3, 6, 9, 12, ...", answer: "15" },
-{ question: "Urutan huruf: A, B, C, D, ... Huruf berikutnya?", answer: "E" },
-{ question: "Apakah angka 38 itu ganjil atau genap?", answer: "genap" },
-{ question: "Manakah yang lebih besar, 67 atau 76?", answer: "76" },
-{ question: "Siti punya Rp10000. Ia membeli es krim Rp4000 dan roti Rp3000. Sisa uangnya?", answer: "3000" },
-{ question: "Harga 1 pensil Rp2000. Jika Rudi membeli 3 pensil, total harganya?", answer: "6000" },
-{ question: "Uang Rp10000 dibagi rata untuk 5 anak. Masing-masing dapat?", answer: "2000" },
-{ question: "Ani punya Rp2000 lalu membeli permen Rp1500. Sisa uang Ani?", answer: "500" },
-{ question: "Budi punya Rp5000 lalu membeli buku Rp3000. Sisa uang Budi?", answer: "2000" },
-{ question: "2 hari = berapa jam?", answer: "48" },
-{ question: "Manakah lebih besar: 1/2 atau 1/4?", answer: "1/2" },
-{ question: "Separuh dari 10 adalah?", answer: "5" },
-{ question: "Seperempat dari 20 adalah?", answer: "5" },
-{ question: "Seekor ayam punya 2 kaki. Berapa kaki dari 4 ayam?", answer: "8" },
-{ question: "Di kebun ada 6 ayam dan 4 bebek. Berapa jumlah semua hewan?", answer: "10" },
-{ question: "Siti punya 10 kue. Ia makan 3 kue dan memberi 2 ke temannya. Sisa berapa kue?", answer: "5" },
-{ question: "Lanjutkan pola: 4, 8, 12, 16, ...", answer: "20" },
-{ question: "Lanjutkan pola: 5, 10, 15, 20, ...", answer: "25" },
-{ question: "Urutan huruf: K, L, M, N, ... Huruf berikutnya?", answer: "O" },
-{ question: "Apakah angka 47 itu ganjil atau genap?", answer: "ganjil" },
-{ question: "Manakah yang lebih kecil, 34 atau 29?", answer: "29" },
-{ question: "Harga 1 buku Rp5000. Jika Siti membeli 2 buku, total harganya?", answer: "10000" },
-{ question: "Uang Rp12000 dibagi rata untuk 4 anak. Masing-masing dapat?", answer: "3000" },
-{ question: "Seekor kambing punya 4 kaki. Berapa kaki dari 3 kambing?", answer: "12" },
-{ question: "Separuh dari 16 adalah?", answer: "8" },
-{ question: "3 hari = berapa jam?", answer: "72" }
+    { question: "Seperempat dari 20 adalah?", answer: "5" },
+    { question: "Luas persegi dengan sisi 7 cm?", answer: "49" },
+    { question: "Keliling persegi panjang 12 cm × 8 cm?", answer: "40" },
+    { question: "Luas segitiga alas 10 cm, tinggi 6 cm?", answer: "30" },
+    { question: "Keliling lingkaran r=7 cm (π=22/7)?", answer: "44" },
+    { question: "345 ... 298", answer: ">" },
+    { question: "85 + 67 = ?", answer: "152" },
+    { question: "95 – 48 = ?", answer: "47" },
+    { question: "125 + 178 = ?", answer: "303" },
+    { question: "280 – 165 = ?", answer: "115" },
+    { question: "24 × 5 = ?", answer: "120" },
+    { question: "36 ÷ 6 = ?", answer: "6" },
+    { question: "Luas persegi sisi 15 cm?", answer: "225" },
+    { question: "Keliling segitiga sisi 10,12,14?", answer: "36" },
+    { question: "Luas jajargenjang alas 20, tinggi 8?", answer: "160" },
+    { question: "Luas lingkaran r=14 cm (π=22/7)?", answer: "616" },
+    { question: "245 + 356 = ?", answer: "601" },
+    { question: "512 – 278 = ?", answer: "234" },
+    { question: "42 × 9 = ?", answer: "378" },
+    { question: "144 ÷ 12 = ?", answer: "12" },
+    { question: "876 ... 999", answer: "<" },
+    { question: "Seperempat dari 40 adalah?", answer: "10" },
+    { question: "Setengah dari 50 adalah?", answer: "25" },
+    { question: "Sepertiga dari 30 adalah?", answer: "10" },
+    { question: "Luas persegi panjang 6 × 5?", answer: "30" },
+    { question: "Keliling persegi sisi 9 cm?", answer: "36" },
+    { question: "Keliling persegi panjang 7 × 5?", answer: "24" },
+    { question: "Jika Ani punya 24 permen, dibagi 4 anak, masing-masing?", answer: "6" },
+    { question: "50 + 75 = ?", answer: "125" },
+    { question: "200 – 175 = ?", answer: "25" },
+    { question: "15 × 12 = ?", answer: "180" },
+    { question: "81 ÷ 9 = ?", answer: "9" },
+    { question: "Luas segitiga alas 12 tinggi 10?", answer: "60" },
+    { question: "Keliling segiempat sisi 11 cm?", answer: "44" },
+    { question: "Bandingkan 450 ... 540", answer: "<" },
+    { question: "Keliling lingkaran r=14 (π=22/7)?", answer: "88" },
+    { question: "Jika ada 60 bola, diambil 1/2, sisa?", answer: "30" },
+    { question: "3/4 dari 40 adalah?", answer: "30" },
+    { question: "100 ÷ 4 = ?", answer: "25" },
+    { question: "15 + 45 + 25 = ?", answer: "85" },
+    { question: "75 – 25 + 10 = ?", answer: "60" },
+    { question: "Keliling persegi panjang 20 × 10?", answer: "60" },
+    { question: "Luas persegi sisi 20?", answer: "400" },
+    { question: "Keliling segitiga sisi 13,14,15?", answer: "42" },
+    { question: "Luas jajargenjang alas 15 tinggi 7?", answer: "105" },
+    { question: "200 + 150 – 75 = ?", answer: "275" },
+    { question: "225 – 125 = ?", answer: "100" },
+    { question: "60 × 5 = ?", answer: "300" },
+    { question: "144 ÷ 6 = ?", answer: "24" },
+    { question: "Bandingkan 700 ... 650", answer: ">" }
 ];
 
 const extraQuestions4 = [
-  // Pola bilangan & huruf
-  { question: "Lanjutkan pola: 2, 4, 6, 8, ...", answer: "10" },
-  { question: "Lanjutkan pola: 5, 10, 15, 20, ...", answer: "25" },
-  { question: "Lanjutkan pola: 1, 3, 5, 7, ...", answer: "9" },
-  { question: "Lanjutkan pola: 10, 20, 30, 40, ...", answer: "50" },
-  { question: "Lanjutkan pola: 9, 7, 5, 3, ...", answer: "1" },
-  { question: "Urutan huruf: A, B, C, D, ... Huruf berikutnya?", answer: "E" },
-  { question: "Urutan huruf: M, N, O, P, ... Huruf berikutnya?", answer: "Q" },
-  { question: "Urutan huruf: Z, Y, X, W, ... Huruf berikutnya?", answer: "V" },
-  { question: "Urutan huruf: C, E, G, I, ... Huruf berikutnya?", answer: "K" },
-  { question: "Urutan huruf: F, H, J, L, ... Huruf berikutnya?", answer: "N" },
-
-  // Perbandingan & logika sederhana
-  { question: "Apakah 25 lebih besar dari 30? (ya/tidak)", answer: "tidak" },
-  { question: "Apakah 48 lebih kecil dari 50? (ya/tidak)", answer: "ya" },
-  { question: "Mana yang ganjil: 14 atau 17?", answer: "17" },
-  { question: "Mana yang genap: 21 atau 28?", answer: "28" },
-  { question: "Apakah 100 adalah bilangan genap? (ya/tidak)", answer: "ya" },
-  { question: "Apakah 77 adalah bilangan ganjil? (ya/tidak)", answer: "ya" },
-  { question: "Manakah yang lebih besar, 36 atau 63?", answer: "63" },
-  { question: "Manakah yang lebih kecil, 82 atau 28?", answer: "28" },
-  { question: "Apakah benar 10 lebih besar dari 15? (ya/tidak)", answer: "tidak" },
-  { question: "Apakah benar 7 lebih kecil dari 20? (ya/tidak)", answer: "ya" },
-
-  // Hitungan sederhana
-  { question: "Ali punya 3 apel. Budi memberi 2 apel lagi. Sekarang apel Ali berapa?", answer: "5" },
-  { question: "Rina punya 10 permen. Ia makan 4. Sisa berapa?", answer: "6" },
-  { question: "Hasil dari 14 + 8 adalah?", answer: "22" },
-  { question: "Hasil dari 25 - 9 adalah?", answer: "16" },
-  { question: "Hasil dari 6 × 3 adalah?", answer: "18" },
-  { question: "Hasil dari 20 ÷ 5 adalah?", answer: "4" },
-  { question: "Harga 1 roti Rp3000. Jika Rina membeli 2 roti, total harganya?", answer: "6000" },
   { question: "Budi punya Rp10000. Ia membeli mainan Rp7500. Sisa uangnya?", answer: "2500" },
-  { question: "Harga 1 pensil Rp2000. Jika Siti membeli 4 pensil, total harganya?", answer: "8000" },
-  { question: "Siti punya Rp5000 lalu membeli permen Rp3500. Sisa uangnya?", answer: "1500" },
-
-  // Logika cerita
-  { question: "Seekor ayam punya 2 kaki. Berapa kaki dari 3 ayam?", answer: "6" },
-  { question: "Seekor kucing tidur siang. Apakah benar semua kucing tidur siang? (ya/tidak)", answer: "tidak" },
-  { question: "Ada 3 kursi dan 4 anak. Apakah kursinya cukup? (ya/tidak)", answer: "tidak" },
-  { question: "Ada 5 bola merah dan 2 bola biru. Mana yang lebih banyak?", answer: "bola merah" },
-  { question: "Jika 1 minggu ada 7 hari, maka 3 minggu ada berapa hari?", answer: "21" },
-  { question: "Jika hari ini Selasa, besok hari apa?", answer: "Rabu" },
-  { question: "Jika hari ini Jumat, 2 hari lagi hari apa?", answer: "Minggu" },
-  { question: "Jika semua buah berwarna merah, apakah apel termasuk merah? (ya/tidak)", answer: "ya" },
-  { question: "Jika semua kucing bisa berenang, apakah benar kucingmu bisa berenang? (ya/tidak)", answer: "ya" },
-  { question: "Jika ada 6 kambing dan 2 pergi, sisa kambing berapa?", answer: "4" },
-
-  // Pecahan & waktu
-  { question: "Setengah dari 12 adalah?", answer: "6" },
-  { question: "Seperempat dari 16 adalah?", answer: "4" },
-  { question: "Separuh dari 18 adalah?", answer: "9" },
-  { question: "Seperempat dari 24 adalah?", answer: "6" },
-  { question: "1 jam = berapa menit?", answer: "60" },
-  { question: "2 jam = berapa menit?", answer: "120" },
-  { question: "30 menit = berapa detik?", answer: "1800" },
-  { question: "Setengah hari = berapa jam?", answer: "12" },
-  { question: "1 hari = berapa jam?", answer: "24" },
-  { question: "3 hari = berapa jam?", answer: "72" },
-
-  // Campuran logika lagi
-  { question: "Jika kamu punya 5 kelereng dan kehilangan 2, berapa sisa kelereng?", answer: "3" },
-  { question: "Mana lebih berat: 1 kg kapas atau 1 kg besi?", answer: "sama" },
-  { question: "Apakah matahari terbit dari timur? (ya/tidak)", answer: "ya" },
-  { question: "Apakah air laut berwarna hijau? (ya/tidak)", answer: "tidak" },
-  { question: "Jika ada 10 siswa dan 4 pergi, sisa siswa berapa?", answer: "6" },
-  { question: "Jika semua manusia bisa berjalan, apakah kamu bisa berjalan? (ya/tidak)", answer: "ya" }
+    { question: "128 + 256 – 178 = ?", answer: "206" },
+    { question: "325 – (118 + 92) = ?", answer: "115" },
+    { question: "42 × 18 = ?", answer: "756" },
+    { question: "144 ÷ 12 + 25 = ?", answer: "37" },
+    { question: "(250 + 175) × 2 = ?", answer: "850" },
+    { question: "(540 – 325) ÷ 5 = ?", answer: "43" },
+    { question: "75 × 24 = ?", answer: "1800" },
+    { question: "96 ÷ 8 + 15 = ?", answer: "27" },
+    { question: "64 × 32 = ?", answer: "2048" },
+    { question: "1024 ÷ 16 = ?", answer: "64" },
+    { question: "450 + 325 – 178 = ?", answer: "597" },
+    { question: "640 – (215 + 125) = ?", answer: "300" },
+    { question: "84 × 19 = ?", answer: "1596" },
+    { question: "(720 ÷ 12) + 35 = ?", answer: "95" },
+    { question: "(180 + 225) × 3 = ?", answer: "1215" },
+    { question: "(980 – 765) ÷ 5 = ?", answer: "43" },
+    { question: "125 × 48 = ?", answer: "6000" },
+    { question: "144 ÷ 9 + 55 = ?", answer: "71" },
+    { question: "128 × 64 = ?", answer: "8192" },
+    { question: "4096 ÷ 32 = ?", answer: "128" },
+    { question: "Jika harga 3 pensil Rp4500, harga 1 pensil?", answer: "1500" },
+    { question: "Sebuah kotak berisi 48 kue dibagi ke 12 anak, masing-masing?", answer: "4" },
+    { question: "Jika 1 jam = 60 menit, 2,5 jam = ... menit?", answer: "150" },
+    { question: "750 – 325 + 200 = ?", answer: "625" },
+    { question: "Jika 5 × X = 100, maka X?", answer: "20" },
+    { question: "24 × 15 = ?", answer: "360" },
+    { question: "360 ÷ 12 = ?", answer: "30" },
+    { question: "Jika panjang 20, lebar 10, keliling?", answer: "60" },
+    { question: "(500 – 250) ÷ 5 = ?", answer: "50" },
+    { question: "2000 ÷ 25 = ?", answer: "80" },
+    { question: "36 × 25 = ?", answer: "900" },
+    { question: "1800 ÷ 90 = ?", answer: "20" },
+    { question: "Jika 12 jam = setengah hari, maka 1 hari = ... jam?", answer: "24" },
+    { question: "4500 – 2750 = ?", answer: "1750" },
+    { question: "Jika 3 buku Rp24000, harga 1 buku?", answer: "8000" },
+    { question: "Jika 2 lusin telur = ... butir?", answer: "24" },
+    { question: "Keliling persegi sisi 25?", answer: "100" },
+    { question: "Jika 7 × ? = 210, maka ?", answer: "30" },
+    { question: "400 + 325 + 275 = ?", answer: "1000" },
+    { question: "(900 ÷ 30) + 25 = ?", answer: "55" },
+    { question: "Jika 1 menit = 60 detik, 5 menit = ... detik?", answer: "300" },
+    { question: "Jika 1 minggu = 7 hari, 4 minggu = ... hari?", answer: "28" },
+    { question: "Jika 1 tahun = 12 bulan, 3 tahun = ... bulan?", answer: "36" },
+    { question: "Jika 2,5 jam = ... menit?", answer: "150" },
+    { question: "9000 ÷ 100 = ?", answer: "90" },
+    { question: "Jika X + 250 = 1000, maka X?", answer: "750" },
+    { question: "Jika 5 × 12 = ?", answer: "60" },
+    { question: "Jika (25 × 4) + 50 = ?", answer: "150" }
 ];
 
 const extraQuestions5 = [
-  { question: "Lanjutkan pola: 5, 10, 15, 20, ...", answer: "25" },
-  { question: "Lanjutkan pola: 2, 4, 8, 16, ...", answer: "32" },
-  { question: "Lanjutkan pola: 1, 4, 9, 16, ...", answer: "25" },
-  { question: "Lanjutkan pola: 2, 5, 10, 17, ...", answer: "26" },
-  { question: "Lanjutkan pola: 11, 13, 17, 19, ...", answer: "23" },
-
-  { question: "Urutan huruf: C, E, G, I, ... Huruf berikutnya?", answer: "K" },
-  { question: "Urutan huruf: Z, Y, X, W, ... Huruf berikutnya?", answer: "V" },
-
-  { question: "Apakah angka 121 itu ganjil atau genap?", answer: "ganjil" },
-  { question: "Manakah yang lebih kecil, 245 atau 254?", answer: "245" },
-  { question: "Hasil dari 15 + 27 adalah?", answer: "42" },
-  { question: "Hasil dari 36 - 19 adalah?", answer: "17" },
-  { question: "Hasil dari 12 × 4 adalah?", answer: "48" },
-  { question: "Hasil dari 84 ÷ 7 adalah?", answer: "12" },
-
-  { question: "Harga 1 buku Rp4500. Jika Budi membeli 3 buku, total harganya?", answer: "13500" },
-  { question: "Rina punya Rp20000. Ia membeli mainan Rp12500. Sisa uangnya?", answer: "7500" },
-  { question: "Ani punya Rp10000 lalu membeli 2 roti (Rp3500/roti). Sisa uang Ani?", answer: "3000" },
-
-  { question: "3 hari = berapa jam?", answer: "72" },
-  { question: "2 minggu = berapa hari?", answer: "14" },
-  { question: "1 jam 30 menit = berapa menit?", answer: "90" },
-
-  { question: "Manakah lebih besar: 2/3 atau 3/5?", answer: "2/3" },
-  { question: "Berapa 3/4 dari 20?", answer: "15" },
-  { question: "Separuh dari 36 adalah?", answer: "18" },
-  { question: "Seperempat dari 100 adalah?", answer: "25" },
-
-  { question: "Seekor sapi punya 4 kaki. Berapa kaki dari 5 sapi?", answer: "20" },
-  { question: "Di kandang ada 8 kambing dan 12 ayam. Berapa jumlah semua hewan?", answer: "20" },
-  { question: "Siti punya 25 kue. Ia makan 7 kue dan memberi 5 ke temannya. Sisa berapa kue?", answer: "13" }
+    { question: "Seperempat dari 100 adalah?", answer: "25" },
+    { question: "Urutan huruf: Z, Y, X, W, ... Huruf berikutnya?", answer: "V" },
+    { question: "Lanjutkan pola: 1, 4, 9, 16, ...", answer: "25" },
+    { question: "Volume kubus sisi 10 cm?", answer: "1000" },
+    { question: "Volume balok 12×8×5?", answer: "480" },
+    { question: "Volume tabung r=7 t=10 (π=22/7)?", answer: "1540" },
+    { question: "Volume prisma alas 20 luas × tinggi 12?", answer: "240" },
+    { question: "Volume limas alas 36 tinggi 15?", answer: "180" },
+    { question: "2345 + 6789 = ?", answer: "9134" },
+    { question: "9876 – 4321 = ?", answer: "5555" },
+    { question: "125 × 125 = ?", answer: "15625" },
+    { question: "2025 ÷ 45 = ?", answer: "45" },
+    { question: "7567 ... 7558", answer: ">" },
+    { question: "Luas permukaan kubus sisi 12?", answer: "864" },
+    { question: "Luas permukaan balok 10×6×8?", answer: "376" },
+    { question: "Luas permukaan tabung r=14 t=20 (π=22/7)?", answer: "2992" },
+    { question: "(325 × 48) – 1575 = ?", answer: "13875" },
+    { question: "(9800 ÷ 25) + 360 = ?", answer: "752" },
+    { question: "215 × 36 = ?", answer: "7740" },
+    { question: "144 ÷ 12 + 205 = ?", answer: "217" },
+    { question: "10245 ... 9998", answer: ">" },
+    { question: "Akar kuadrat dari 225?", answer: "15" },
+    { question: "15³ = ?", answer: "3375" },
+    { question: "Jika 1/5 dari 200 = ?", answer: "40" },
+    { question: "Jika 3/4 dari 120 = ?", answer: "90" },
+    { question: "Jika 10% dari 500 = ?", answer: "50" },
+    { question: "Urutan bilangan: 2, 4, 8, 16, ...", answer: "32" },
+    { question: "Urutan bilangan ganjil: 1, 3, 5, 7, ...", answer: "9" },
+    { question: "Jika X² = 64, maka X?", answer: "8" },
+    { question: "Akar kuadrat 400?", answer: "20" },
+    { question: "Jika 2⁵ = ?", answer: "32" },
+    { question: "Jika 3³ = ?", answer: "27" },
+    { question: "Jika 4³ = ?", answer: "64" },
+    { question: "Jika 5² = ?", answer: "25" },
+    { question: "Jika 12² = ?", answer: "144" },
+    { question: "Jika 20² = ?", answer: "400" },
+    { question: "Jika 30² = ?", answer: "900" },
+    { question: "Jika 11² = ?", answer: "121" },
+    { question: "Jika 15² = ?", answer: "225" },
+    { question: "Jika 25² = ?", answer: "625" },
+    { question: "Jika 1000 ÷ 25 = ?", answer: "40" },
+    { question: "Jika 5000 ÷ 125 = ?", answer: "40" },
+    { question: "Jika 10! ÷ 9! = ?", answer: "10" },
+    { question: "Jika 8! ÷ 7! = ?", answer: "8" },
+    { question: "Jika pola 2, 6, 12, 20, ...", answer: "30" },
+    { question: "Jika pola 5, 10, 20, 40, ...", answer: "80" },
+    { question: "Jika pola 1, 2, 4, 8, 16, ...", answer: "32" },
+    { question: "Jika pola 10, 20, 30, 40, ...", answer: "50" },
+    { question: "Jika pola 100, 90, 80, 70, ...", answer: "60" }
 ];
 
 function generateLevel1Question() {
@@ -660,7 +727,7 @@ function generateLevel1Question() {
 
   // default aritmatika level 1
   while (true) {
-    const x = randInt(1, 9), y = randInt(1, 9), z = randInt(1, 9);
+    const x = randInt(5, 15), y = randInt(5, 20), z = randInt(1, 9);
     const ops = [Math.random() < 0.5 ? '+' : '-', Math.random() < 0.5 ? '+' : '-'];
     const expr = `${x} ${ops[0]} ${y} ${ops[1]} ${z}`;
     const val = eval(expr);
@@ -721,7 +788,7 @@ function generateLevel2Question() {
     return { question: q.question, answer: q.answer, isDummy: true };
   }
   while (true) {
-    const x = randInt(1, 6), y = randInt(1, 6), z = randInt(1, 6);
+    const x = randInt(5, 15), y = randInt(10, 15), z = randInt(1, 6);
     const ops = ['+', '-', '×', '÷'];
     const op1 = ops[randInt(0, ops.length - 1)];
     const op2 = ops[randInt(0, ops.length - 1)];
@@ -742,7 +809,7 @@ function generateLevel3Question() {
     return { question: q.question, answer: q.answer, isDummy: true };
   }
   while (true) {
-    const a = randInt(1, 6), b = randInt(1, 6), c = randInt(1, 6), d = randInt(1, 6);
+    const a = randInt(5, 15), b = randInt(10, 20), c = randInt(1, 6), d = randInt(1, 6);
     const ops = ['+', '-', '×', '÷'];
     const op1 = ops[randInt(0, ops.length - 1)];
     const op2 = ops[randInt(0, ops.length - 1)];
@@ -764,7 +831,7 @@ function generateLevel4Question() {
     return { question: q.question, answer: q.answer, isDummy: true };
   }
   while (true) {
-    const a = randInt(1, 6), b = randInt(1, 6), c = randInt(1, 6), d = randInt(1, 6), e = randInt(1, 6);
+    const a = randInt(5, 15), b = randInt(10, 20), c = randInt(1, 6), d = randInt(1, 6), e = randInt(1, 6);
     const ops = ['+', '-', '×', '÷'];
     const op1 = ops[randInt(0, ops.length - 1)];
     const op2 = ops[randInt(0, ops.length - 1)];
@@ -787,7 +854,7 @@ function generateLevel5Question() {
     return { question: q.question, answer: q.answer, isDummy: true };
   }
   while (true) {
-    const a = randInt(1, 6), b = randInt(1, 6), c = randInt(1, 6), d = randInt(1, 6), e = randInt(1, 6), f = randInt(1, 6);
+    const a = randInt(5, 15), b = randInt(10, 20), c = randInt(1, 6), d = randInt(1, 6), e = randInt(1, 6), f = randInt(1, 6);
     const ops = ['+', '-', '×', '÷'];
     const op1 = ops[randInt(0, ops.length - 1)];
     const op2 = ops[randInt(0, ops.length - 1)];
@@ -804,19 +871,42 @@ function generateLevel5Question() {
 
 // --- router untuk soal per level ---
 function generateMathQuestion() {
-  if (gameState.level === 1) {
-    return generateLevel1Question();
-  } else if (gameState.level === 2) {
-    return generateLevel2Question();
-  } else if (gameState.level === 3) {
-    return generateLevel3Question();
-  } else if (gameState.level === 4) {
-    return generateLevel4Question();
-  } else if (gameState.level === 5) {
-    return generateLevel5Question();
-  } else {
+  const level = gameState.level; // level aktif
+
+  // fallback kalau level belum ter-set
+  if (!level) {
     return { question: "Level tidak ditemukan", answer: null };
   }
+  if (!usedQuestions[level]) usedQuestions[level] = new Set();
+
+  let q, key;
+  for (let i = 0; i < MAX_UNIQUE_TRIES; i++) {
+    if (level === 1) {
+      q = generateLevel1Question();
+    } else if (level === 2) {
+      q = generateLevel2Question();
+    } else if (level === 3) {
+      q = generateLevel3Question();
+    } else if (level === 4) {
+      q = generateLevel4Question();
+    } else if (level === 5) {
+      q = generateLevel5Question();
+    } else {
+      return { question: "Level tidak ditemukan", answer: null };
+    }
+
+    // kunci unik: teks soal + (jika ada) path gambar
+    key = (q.image ? `IMG:${q.image}|` : "") + `Q:${q.question}`;
+
+    if (!usedQuestions[level].has(key)) {
+      usedQuestions[level].add(key); // tandai sudah dipakai
+      return q;                      // berikan soal ini
+    }
+    // kalau sudah pernah, ulang cari soal baru
+  }
+
+  // Kalau sudah mencoba berkali-kali dan semua sudah pernah muncul
+  return { question: "⚠️ Soal habis untuk level ini.", answer: null, isDummy: true };
 }
 
 
