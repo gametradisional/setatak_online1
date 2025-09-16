@@ -1,13 +1,21 @@
-/* Istatak Digital Game Styles */
+.player-setup {
+        background-image: url('bb1.png');
+        background-size: cover;       
+        background-position: center;  
+        background-repeat: no-repeat; 
+}
 
-/* Board Styles */
+.game-board {
+        background-image: url('bb2.png');
+        background-size: cover;       
+        background-position: center;  
+        background-repeat: no-repeat; 
+}
 
-/* Style dasar semua kotak */
 .istatak-box {
     border: 3px solid #374151;
     transition: all 0.3s ease;
     position: relative;
-    /* warna default bisa kosong atau tetap */
     background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
 }
 
@@ -31,7 +39,6 @@
   background: #1d4ed8;
 }
 
-/* Override warna per level */
 .level-1-box { background: linear-gradient(135deg, #f0f9ff 0%, #bcc6e7 100%); }
 .level-2-box { background: linear-gradient(135deg, #fef6e4 0%, #d1b958 100%); }
 .level-3-box { background: linear-gradient(135deg, #ecfdf5 0%, #4cb38a 100%); }
@@ -44,8 +51,6 @@
 .finish-arc.level-4-box { background: linear-gradient(135deg, #eef2ff 0%, #031a74 100%); }
 .finish-arc.level-5-box { background: linear-gradient(135deg, #fff1f2 0%, #da3447 100%); }
 
-
-/* Player Character Styles */
 .player-character {
     position: absolute;
     transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -54,13 +59,11 @@
     filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
 }
 
-/* Character Setup Screen Styles */
 .player-name-input {
   border: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .emoji-choice {
-  /* Gaya dasar untuk setiap emoji */
   border: 2px solid transparent;
   width: 48px;
   height: 48px;
@@ -71,7 +74,6 @@
 }
 
 .emoji-choice.selected {
-  /* Gaya untuk emoji yang terpilih */
   border-color: #ffffff;
   background-color: rgba(255, 255, 255, 0.2);
 }
@@ -85,16 +87,17 @@
   padding: 4px;
   transition: 0.2s;
 }
+
 .icon-choice img {
   width: 50px;
   height: 50px;
 }
+
 .icon-choice.selected {
   border-color: #3498db;
   background: #eaf4ff;
 }
 
-/* Current Box Highlighting */
 .current-box { 
     background: linear-gradient(45deg, #fef3c7, #fbbf24);
     box-shadow: 0 0 20px rgba(251, 191, 36, 0.6);
@@ -102,18 +105,17 @@
 }
 
 .istatak-box.start-box {
-  font-size: 14px;   /* kecilkan tulisan */
-  font-weight: bold; /* opsional, biar tetap jelas */
-  letter-spacing: 1px; /* opsional, agak renggang */
+  font-size: 14px;   
+  font-weight: bold; 
+  letter-spacing: 1px; 
 }
 
 .start-box .start-label {
-  font-size: 14px;     /* kecil */
+  font-size: 14px;     
   font-weight: bold;
-  color: #333;         /* biar jelas */
-  letter-spacing: 1px; /* opsional */
+  color: #333;         
+  letter-spacing: 1px; 
 }
-
 
 @keyframes pulse {
     0%, 100% { 
@@ -124,13 +126,11 @@
     }
 }
 
-/* Modal Styles */
 .math-modal {
     backdrop-filter: blur(12px);
     background: rgba(0, 0, 0, 0.85);
 }
 
-/* Animation Styles */
 .hop-animation {
     animation: hop 0.8s ease-in-out;
 }
@@ -209,21 +209,6 @@
   border: 3px solid #fbbf24;
 }
 
-/* Background Styles */
-.player-setup {
-        background-image: url('bb1.png');
-        background-size: cover;       /* Biar memenuhi layar */
-        background-position: center;  /* Pusatkan gambar */
-        background-repeat: no-repeat; /* Jangan diulang */
-    }
-
-.game-board {
-        background-image: url('bb2.png');
-        background-size: cover;       /* Biar memenuhi layar */
-        background-position: center;  /* Pusatkan gambar */
-        background-repeat: no-repeat; /* Jangan diulang */
-    }
-
 /* Glass Effect */
 .glass-effect {
     background: rgba(255, 255, 255, 0.25);
@@ -251,7 +236,6 @@
     }
 }
 
-/* Responsive Design */
 @media (max-width: 768px) {
     .istatak-box {
         width: 20px !important;
@@ -263,7 +247,6 @@
     }
     
     .player-character {
-        /* Ukuran responsif */
         font-size: 1.5rem;
     }
     
@@ -288,7 +271,6 @@
     }
     
     .player-character {
-        /* Ukuran responsif */
         font-size: 1.25rem;
     }
     
@@ -302,47 +284,12 @@
     }
 }
 
-/* Custom Scrollbar */
-
-/* === Tambahan untuk html agar scrollbar selalu muncul === */
 html {
-    overflow-y: auto;   /* paksa scrollbar vertikal muncul */
-    scrollbar-width: thin; /* Firefox */
-    scrollbar-color: #888 #f0f0f0; /* Warna scrollbar */
+    overflow-y: auto;   
+    scrollbar-width: thin; 
+    scrollbar-color: #888 #f0f0f0; 
 }
 
-/* Untuk browser WebKit (Chrome, Safari, Edge Chromium) */
-html::-webkit-scrollbar {
-    width: 8px;
-}
-html::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 4px;
-}
-html::-webkit-scrollbar-track {
-    background-color: #f0f0f0;
-}
-
-/* Scrollbar untuk body */
-body {
-    overflow-y: auto; /* Selalu tampilkan scrollbar vertikal */
-    scrollbar-width: thin; /* Untuk Firefox */
-    scrollbar-color: #888 #f0f0f0; /* Warna scrollbar (thumb dan track) */
-}
-
-/* Untuk browser WebKit (Chrome, Safari) */
-body::-webkit-scrollbar {
-    width: 8px;
-}
-body::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 4px;
-}
-body::-webkit-scrollbar-track {
-    background-color: #f0f0f0;
-}
-
-/* Button Hover Effects */
 button {
     transition: all 0.3s ease;
 }
@@ -355,13 +302,11 @@ button:active {
     transform: translateY(0);
 }
 
-/* Input Focus Effects */
 input:focus {
     transform: scale(1.02);
     box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
 }
 
-/* Loading Animation */
 .loading {
     animation: spin 1s linear infinite;
 }
@@ -371,13 +316,11 @@ input:focus {
     to { transform: rotate(360deg); }
 }
 
-/* Grid papan dinamis */
 .board-grid {
     display: grid;
     gap: 12px;
 }
   
-/* Kotak finish melengkung (level 2) */
 .finish-arc {
   border: 3px solid #374151;
   background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 100%);
@@ -390,21 +333,18 @@ input:focus {
   justify-content: center;
   font-weight: 800;
   color: #111827;
-
-  /* 🔹 biarkan grid tentukan lebar, jangan fixed */
   width: 100%;
-  height: 72px;   /* samakan tinggi dengan kotak lain */
+  height: 72px;  
 }
 
-/* === Tampilan form Atur Pemain === */
 #playerSetup {
-  display: none;              /* awalnya sembunyi */
+  display: none;              
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);  /* transparansi gelap di belakang */
+  background: rgba(0, 0, 0, 0.4);  
   justify-content: center;
   align-items: center;
   z-index: 1000;
@@ -421,7 +361,6 @@ input:focus {
   text-align: left;
 }
 
-/* Styling tiap blok pemain */
 #playerSetup .player-section {
   margin-bottom: 20px;
   padding: 15px;
@@ -440,7 +379,7 @@ input:focus {
   margin: 0 auto;
   margin-top: 15px;
   padding: 10px 20px;
-  background: #3b82f6; /* biru */
+  background: #3b82f6; 
   color: white;
   border: none;
   border-radius: 8px;
