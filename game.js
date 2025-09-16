@@ -1,33 +1,15 @@
-/**
- * Istatak Digital – Level 1 & 2
- * - Pilih pemain → atur karakter → pilih level
- * - Jalur sesuai sketsa (persegi berdempetan, level 2 finish melengkung)
- * - Menang cukup maju ke FINISH (tanpa balik)
- * - Level 1: x ± y ± z (hasil ≥ 0)
- * - Level 2: + − × ÷ (hasil bulat, ≥ 0)
- * - Giliran beruntun: benar = lanjut, salah/timeout = pindah
- * - Timer 10 detik + indikator
- */
 
-// Pilihan emoji yang tersedia untuk pemain
-// === Soal unik per level ===
 const usedQuestions = { 1: new Set(), 2: new Set(), 3: new Set(), 4: new Set(), 5: new Set() };
-const MAX_UNIQUE_TRIES = 50; // batas percobaan cari soal unik
+const MAX_UNIQUE_TRIES = 50; 
 const availableEmojis = [ 
-  // existing
   '🚀', '⭐️', '⚡️', '❤️', '🎉', '🌟', 
   '👾', '👽', '🤖', '👑', '🔥', '💧', '☀️', 
-  '🌸', '🦖',
-
-  // new ones
-  '🍎', '🍕', '🍩', '🍔', '🍓', // makanan
-  '🐱', '🐶', '🐼', '🐸', '🐧', // hewan
-  '🚗', '🚌', '🚲', '✈️', '🚤', // transportasi
-  '⚽️', '🏀', '🏆', '🎮', '🎲'  // hobi/game
+  '🌸', '🦖', '🍎', '🍕', '🍩', '🍔', '🍓', 
+  '🐱', '🐶', '🐼', '🐸', '🐧', 
+  '🚗', '🚌', '🚲', '✈️', '🚤', 
+  '⚽️', '🏀', '🏆', '🎮', '🎲'  
 ];
 
-
-// Basis data pemain, tanpa ikon dan nama awal
 const playerBaseData = [
   { color: 'bg-blue-500', bgGradient: 'from-blue-400 to-blue-600' },
   { color: 'bg-pink-500', bgGradient: 'from-pink-400 to-pink-600' },
@@ -40,25 +22,15 @@ const gameState = {
   currentPlayer: 0,
   players: [],
   level: 1,
-  path: [],            // array berurutan: [1,2,...,N,'FINISH']
-  cellMap: {},         // nomor -> {row, col} untuk posisi grid
+  path: [],            
+  cellMap: {},         
   gridCols: 3,
   gridRows: 3,
   currentQuestion: null,
   currentAnswer: null
 };
 
-/* ---------------------------
-   DEFINISI LAYOUT PER LEVEL
-   ---------------------------
-
-  Koordinat menggunakan grid (row, col) 1-based.
-  Jalur berjalan sesuai urutan angka → FINISH.
-  (Tata letak mengikuti sketsa; bisa disesuaikan mudah.)
-*/
-
 const levelLayouts = {
-  // LEVEL 1
   1: {
     gridCols: 3,
     gridRows: 6,
@@ -70,8 +42,6 @@ const levelLayouts = {
     },
     finishArc: false
   },
-
-  // LEVEL 2
   2: {
     gridCols: 3,
     gridRows: 7,
@@ -86,8 +56,6 @@ const levelLayouts = {
     },
     finishArc: true
   },
-
-  // LEVEL 3
   3: {
     gridCols: 4,
     gridRows: 7,
@@ -103,8 +71,6 @@ const levelLayouts = {
     },
     finishArc: true
   },
-
-  // LEVEL 4
   4: {
     gridCols: 5,
     gridRows: 7,
@@ -120,8 +86,6 @@ const levelLayouts = {
     },
     finishArc: true
   },
-
-  // LEVEL 5
   5: {
     gridCols: 5,
     gridRows: 8,
@@ -157,8 +121,6 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-/* ---------- UTIL GRID ---------- */
-
 function buildBoardForLevel(level) {
   const layout = levelLayouts[level];
   gameState.level = level;
@@ -172,7 +134,6 @@ function buildBoardForLevel(level) {
   grid.style.gridTemplateColumns = `repeat(${layout.gridCols}, 72px)`;
   grid.style.gridTemplateRows = `repeat(${layout.gridRows}, 72px)`;
 
-  // render semua sel yang ada di cellMap
   for (const key of layout.path) {
     const cell = layout.cells[key];
     const div = document.createElement('div');
@@ -190,13 +151,12 @@ function buildBoardForLevel(level) {
 
 } else if (key === 'START') {
   div.className = `istatak-box start-box level-${level}-box rounded-2xl flex items-center justify-center shadow-lg`;
-  div.style.width = "72px";   // ukuran tetap
+  div.style.width = "72px";   
   div.style.height = "72px";
   div.style.gridColumn = `${cell.c}`;
   div.style.gridRow = `${cell.r}`;
   div.id = 'box-START';
 
-  // teks kecil untuk START
   const label = document.createElement('span');
   label.className = 'start-label';
   label.textContent = 'START';
@@ -204,8 +164,8 @@ function buildBoardForLevel(level) {
 
 } else {
   div.className = `istatak-box level-${level}-box rounded-2xl flex items-center justify-center relative shadow-lg`;
-  div.style.width = "72px";   // kecilin kotak
-  div.style.height = "72px";  // kecilin kotak
+  div.style.width = "72px";   
+  div.style.height = "72px";  
   div.style.gridColumn = `${cell.c}`;
   div.style.gridRow = `${cell.r}`;
   div.id = `box-${key}`;
@@ -220,17 +180,14 @@ function buildBoardForLevel(level) {
   }
 }
 
-/* ---------- SETUP FLOW ---------- */
-
 function selectPlayers(num) {
   gameState.totalPlayers = num;
   gameState.players = [];
   for (let i = 0; i < num; i++) {
-    // Inisialisasi pemain dengan data dasar dari playerBaseData
     gameState.players.push({
       id: i,
       pathIndex: 0,
-      character: { ...playerBaseData[i], name: `Pemain ${i+1}`, icon: availableEmojis[i] } // Atur nama & ikon default
+      character: { ...playerBaseData[i], name: `Pemain ${i+1}`, icon: availableEmojis[i] } 
     });
   }
   document.getElementById('setupScreen').classList.add('hidden');
@@ -265,10 +222,8 @@ function selectEmoji(playerId, el) {
   container.querySelectorAll('.emoji-choice').forEach(iconEl => iconEl.classList.remove('selected'));
   el.classList.add('selected');
 
-  // update icon di state
   gameState.players[playerId].character.icon = el.dataset.icon;
 
-  // 🔹 update juga icon preview di kiri input nama
   const iconSpan = document.querySelector(`#playerSetupContainer [data-player-id="${playerId}"]`)
     .closest('.flex')
     .querySelector('.player-icon-status');
@@ -290,10 +245,8 @@ function saveCharacterSetup() {
 }
 
 function selectLevel(level) {
-  // simpan level yang dipilih sementara
   gameState.pendingLevel = level;
 
-  // tampilkan modal aturan
   const modal = document.getElementById('rulesModal');
   modal.classList.remove('hidden');
   modal.classList.add('flex');
@@ -307,23 +260,18 @@ let availableQuestions = {
   5: []
 };
 
-// 🔹 Reset pool soal ketika pertandingan baru dimulai
 function startLevelAfterRules() {
   const level = gameState.pendingLevel;
 
-  // ✅ PENTING: set level aktif utk router generateMathQuestion
   gameState.level = level;
 
-  // ✅ Reset daftar soal yang sudah pernah muncul di level ini
   if (!usedQuestions[level]) usedQuestions[level] = new Set();
   usedQuestions[level].clear();
 
-  // tutup modal aturan
   const modal = document.getElementById('rulesModal');
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 
-  // jalankan proses lama selectLevel
   buildBoardForLevel(level);
   document.getElementById('levelScreen').classList.add('hidden');
   document.getElementById('gameScreen').classList.remove('hidden');
@@ -344,8 +292,6 @@ function backToLevelSelect() {
   clearTimers();
 }
 
-/* ---------- DISPLAY ---------- */
-
 function updateGameDisplay() {
   updatePlayerCharacters();
   updatePlayersStatus();
@@ -354,14 +300,13 @@ function updateGameDisplay() {
 }
 
 function currentTargetNumber(player) {
-  // target kotak berikutnya di path (1..N) atau 'FINISH'
   return gameState.path[player.pathIndex + 1] || 'FINISH';
 }
 
 function updatePlayerCharacters() {
   document.querySelectorAll('.player-character').forEach(el => el.remove());
   gameState.players.forEach(p => {
-    const target = gameState.path[p.pathIndex] || null; // posisi saat ini (0 = belum di kotak mana pun)
+    const target = gameState.path[p.pathIndex] || null; 
     if (!target) return;
     const box = document.getElementById(`box-${target}`);
     if (box) {
@@ -369,7 +314,6 @@ function updatePlayerCharacters() {
       char.className = 'player-character';
       char.textContent = p.character.icon;
 
-      // tata posisi jika numpuk
       const inSame = gameState.players.filter(q => gameState.path[q.pathIndex] === target);
       const idx = inSame.findIndex(q => q.id === p.id);
       const pos = [
@@ -425,11 +369,8 @@ function updateTargetHighlight() {
   if (box) box.classList.add('current-box');
 }
 
-/* ---------- SOAL ---------- */
-
 function randInt(min, max){ return Math.floor(Math.random()*(max-min+1))+min; }
 
-// === SOAL TAMBAHAN (dummy, nanti kamu isi sendiri) ===
 const extraQuestions1 = [
 { question: "Ani punya 5 apel, beli 3 lagi. Berapa total apel?", answer: "8" },
 { question: "Budi punya 12 kelereng, bagi 4 ke temannya. Sisa berapa?", answer: "8" },
@@ -470,32 +411,32 @@ const extraQuestions1 = [
 const questionsWithImages = [
 {
   question: "Tebak bangun datar ini",
-  image: "picture/persegi.png", // path gambar
+  image: "picture/persegi.png", 
   answer: "persegi"
 },
 {
   question: "Tebak bangun datar ini",
-  image: "picture/segitiga.png", // path gambar
+  image: "picture/segitiga.png", 
   answer: "segitiga"
 },
 {
   question: "Tebak bangun datar ini",
-  image: "picture/lingkaran.png", // path gambar
+  image: "picture/lingkaran.png", 
   answer: "lingkaran"
 },
 {
   question: "Tebak bangun datar ini",
-  image: "picture/trapesium.png", // path gambar
+  image: "picture/trapesium.png", 
   answer: "trapesium"
 },
 {
   question: "Tebak bangun datar ini",
-  image: "picture/jgenjang.png", // path gambar
+  image: "picture/jgenjang.png", 
   answer: "jajar genjang"
 },
 {
   question: "Tebak bangun datar ini",
-  image: "picture/persegip.png", // path gambar
+  image: "picture/persegip.png", 
   answer: "persegi panjang"
 }
 ];
@@ -712,20 +653,16 @@ const extraQuestions5 = [
 
 function generateLevel1Question() {
   const r = Math.random();
-
-  // 30% soal gambar
   if (r < 0.3) {
     const q = questionsWithImages[Math.floor(Math.random() * questionsWithImages.length)];
     return { question: q.question, answer: q.answer, image: q.image, isDummy: true };
   }
 
-  // 30% soal tambahan (kalau mau persis 30%, ubah ke: else if (r < 0.6))
   if (r < 0.6) {
     const q = extraQuestions1[Math.floor(Math.random() * extraQuestions1.length)];
     return { question: q.question, answer: q.answer, isDummy: true };
   }
 
-  // default aritmatika level 1
   while (true) {
     const x = randInt(5, 15), y = randInt(5, 20), z = randInt(1, 9);
     const ops = [Math.random() < 0.5 ? '+' : '-', Math.random() < 0.5 ? '+' : '-'];
@@ -735,8 +672,6 @@ function generateLevel1Question() {
   }
 }
 
-
-// === Utility umum ===
 function randInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
@@ -758,16 +693,6 @@ function evalNoPrecedence(a, b, op) {
   }
 }
 
-// === Template generator umum ===
-// ==========================
-// Helper untuk evaluasi ekspresi dengan prioritas operator
-// ==========================
-// ==========================
-// Helper evaluasi dengan prioritas operator
-// ==========================
-// ==========================
-// Helper evaluasi dengan prioritas operator
-// ==========================
 function evalWithPrecedence(expr) {
   const jsExpr = expr.replace(/×/g, '*').replace(/÷/g, '/');
   let result;
@@ -779,9 +704,6 @@ function evalWithPrecedence(expr) {
   return result;
 }
 
-// ==========================
-// Level 2
-// ==========================
 function generateLevel2Question() {
   if (Math.random() < 0.6 && extraQuestions2 && extraQuestions2.length > 0) {
     const q = extraQuestions2[Math.floor(Math.random() * extraQuestions2.length)];
@@ -800,9 +722,6 @@ function generateLevel2Question() {
   }
 }
 
-// ==========================
-// Level 3
-// ==========================
 function generateLevel3Question() {
   if (Math.random() < 0.6 && extraQuestions3 && extraQuestions3.length > 0) {
     const q = extraQuestions3[Math.floor(Math.random() * extraQuestions3.length)];
@@ -822,9 +741,6 @@ function generateLevel3Question() {
   }
 }
 
-// ==========================
-// Level 4
-// ==========================
 function generateLevel4Question() {
   if (Math.random() < 0.6 && extraQuestions4 && extraQuestions4.length > 0) {
     const q = extraQuestions4[Math.floor(Math.random() * extraQuestions4.length)];
@@ -845,9 +761,6 @@ function generateLevel4Question() {
   }
 }
 
-// ==========================
-// Level 5
-// ==========================
 function generateLevel5Question() {
   if (Math.random() < 0.6 && extraQuestions5 && extraQuestions5.length > 0) {
     const q = extraQuestions5[Math.floor(Math.random() * extraQuestions5.length)];
@@ -869,11 +782,9 @@ function generateLevel5Question() {
   }
 }
 
-// --- router untuk soal per level ---
 function generateMathQuestion() {
-  const level = gameState.level; // level aktif
+  const level = gameState.level; 
 
-  // fallback kalau level belum ter-set
   if (!level) {
     return { question: "Level tidak ditemukan", answer: null };
   }
@@ -895,22 +806,16 @@ function generateMathQuestion() {
       return { question: "Level tidak ditemukan", answer: null };
     }
 
-    // kunci unik: teks soal + (jika ada) path gambar
     key = (q.image ? `IMG:${q.image}|` : "") + `Q:${q.question}`;
 
     if (!usedQuestions[level].has(key)) {
-      usedQuestions[level].add(key); // tandai sudah dipakai
-      return q;                      // berikan soal ini
+      usedQuestions[level].add(key); 
+      return q;                      
     }
-    // kalau sudah pernah, ulang cari soal baru
   }
 
-  // Kalau sudah mencoba berkali-kali dan semua sudah pernah muncul
   return { question: "⚠️ Soal habis untuk level ini.", answer: null, isDummy: true };
 }
-
-
-/* ---------- GAMEPLAY ---------- */
 
 let answerTimer = null;
 let countdownInterval = null;
@@ -921,18 +826,15 @@ function showMathQuestion() {
   gameState.currentAnswer  = q.answer;
   gameState.currentIsDummy = !!q.isDummy;
 
-  // tampilkan teks soal
   document.getElementById('mathQuestion').textContent = q.question;
 
-  // === tampilkan gambar kalau ada ===
-  const imgEl = document.getElementById('questionImage'); // pastikan ada di HTML
+  const imgEl = document.getElementById('questionImage'); 
   if (q.image) {
       imgEl.src = q.image;
       imgEl.classList.remove('hidden');
   } else {
       imgEl.classList.add('hidden');
   }
-  // ================================
 
   document.getElementById('mathAnswer').value = '';
   document.getElementById('answerFeedback').classList.add('hidden');
@@ -967,21 +869,17 @@ function showMathQuestion() {
 function playSound(id) {
   const sound = document.getElementById(id);
   if (sound) {
-    sound.currentTime = 0; // mulai ulang setiap kali dipanggil
-    sound.play().catch(()=>{}); // biar gak error di browser tertentu
+    sound.currentTime = 0; 
+    sound.play().catch(()=>{}); 
   }
 }
 
-// Normalisasi jawaban teks: trim, lowercase, hilangkan aksen/diakritik, rapikan spasi
-
-  // === Helper untuk normalisasi jawaban teks ===
-// === Helper untuk normalisasi jawaban teks ===
 function normalizeAnswerStr(s) {
     return String(s)
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // hapus aksen
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') 
       .toLowerCase()
       .trim()
-      .replace(/\s+/g, ' '); // rapikan spasi ganda
+      .replace(/\s+/g, ' '); 
 }
 
 function isTextCorrect(input, correct) {
@@ -999,10 +897,8 @@ function checkAnswer() {
     const isDummy = gameState.currentIsDummy || false;
 
     if (isDummy) {
-        // === ANGKA ===
         if (!isNaN(correct)) {
             if (input == correct) {
-                // ✅ BENAR
                 fb.textContent = '✅ Benar!';
                 fb.className   = 'mt-6 text-center font-bold text-lg text-green-600';
                 fb.classList.remove('hidden');
@@ -1013,7 +909,6 @@ function checkAnswer() {
                     setTimeout(() => moveCurrentPlayer(), 1000);
                 }, 1000);
             } else {
-                // ❌ SALAH (apapun isi input selain jawaban benar)
                 fb.textContent = `❌ Salah! Jawaban: ${correct}`;
                 fb.className   = 'mt-6 text-center font-bold text-lg text-red-600';
                 fb.classList.remove('hidden');
@@ -1025,7 +920,6 @@ function checkAnswer() {
                 }, 1500);
             }
         }
-        // === TEKS ===
         else {
             if (isTextCorrect(input, correct)) {
                 fb.textContent = '✅ Benar!';
@@ -1050,7 +944,6 @@ function checkAnswer() {
             }
         }
     }
-    // === SOAL RANDOM OPERASI ===
     else {
         if (input === "") {
             fb.textContent = '❌ Jawaban tidak boleh kosong!';
@@ -1108,25 +1001,21 @@ function clearTimers(){
 function moveCurrentPlayer() {
   const p = gameState.players[gameState.currentPlayer];
 
-  // lompat ke target berikutnya
   p.pathIndex++;
 
-  // update tampilan token
   updateGameDisplay();
 
-  // kasih animasi hop
   setTimeout(() => {
     document.querySelectorAll('.player-character').forEach(el => {
       if (el.textContent === p.character.icon) {
         el.classList.add('hop-animation');
         el.addEventListener('animationend', () => {
-          el.classList.remove('hop-animation'); // reset biar bisa dipakai lagi
+          el.classList.remove('hop-animation'); 
         }, { once: true });
       }
     });
   }, 100);
 
-  // cek finish
   const onNow = gameState.path[p.pathIndex];
   if (onNow === 'FINISH') {
     setTimeout(() => showWinner(p), 800);
@@ -1145,18 +1034,15 @@ function closeMathModal() {
 }
 
 function showWinner(winner) {
-  // Tambahkan ikon pemenang
   const winnerIcon = document.getElementById('winnerIcon');
   winnerIcon.textContent = winner.character.icon;
   winnerIcon.className = 'text-6xl mb-2';
 
-  // Tambahkan teks pemenang
   document.getElementById('winnerText').textContent = `${winner.character.name} Menang!`;
   document.getElementById('winModal').classList.remove('hidden');
   document.getElementById('winModal').classList.add('flex');
 
-  // === Efek Confetti ===
-  const duration = 3 * 1000; // 3 detik
+  const duration = 3 * 1000; 
   const animationEnd = Date.now() + duration;
 
   (function frame() {
@@ -1178,7 +1064,6 @@ function showWinner(winner) {
     }
   })();
 
-  // === Efek Suara "yeyy" ===
   const winSound = new Audio("sounds/yey.mp3");
   winSound.play();
 }
@@ -1199,8 +1084,6 @@ function backToSetup() {
   clearTimers();
   closeWinModal();
 }
-
-/* ---------- INIT ---------- */
 
 function initializeGame() {
   const ans = document.getElementById('mathAnswer');
