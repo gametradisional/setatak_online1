@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Istatak Digital – Level 1 & 2</title>
+  <title>Setatak Digital</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <link rel="stylesheet" href="style.css"/>
@@ -24,12 +24,9 @@
             <button onclick="selectPlayers(4)" class="glass-effect hover:bg-white/30 text-white font-bold py-4 rounded-xl transition-all transform hover:scale-105 col-span-2"><div class="text-4xl">👥👥</div>4 Pemain</button>
           </div>
         </div>
-        <!-- Tombol Putar Musik -->
         <div class="music-control">
           <button id="play-music" class="music-btn">🎵 Putar Musik</button>
         </div>
-
-        <!-- Audio Player (hidden) -->
         <audio id="bg-music" loop>
           <source src="musik.mp3" type="audio/mpeg">
           Browser kamu tidak mendukung audio.
@@ -78,40 +75,36 @@
     </div>
   </div>
   
-  <!-- Modal Aturan Bermain -->
-<div id="rulesModal"
-     class="fixed inset-0 z-50 bg-black/60 hidden items-center justify-center p-4">
-  <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg p-8 text-center">
-    <div class="text-5xl mb-3">📘</div>
-    <h2 class="text-2xl font-bold mb-4">Aturan Bermain</h2>
+  <div id="rulesModal"
+      class="fixed inset-0 z-50 bg-black/60 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-xl w-full max-w-lg p-8 text-center">
+      <div class="text-5xl mb-3">📘</div>
+      <h2 class="text-2xl font-bold mb-4">Aturan Bermain</h2>
 
-    <ul class="text-left text-gray-700 space-y-2">
-      <li>🎯 Jawab soal untuk maju ke kotak berikutnya.</li>
-      <li>✅ Jawaban benar → giliran tetap (boleh lanjut).</li>
-      <li>❌ Jawaban salah / ⏳ waktu habis → giliran pindah.</li>
-      <li>🏁 Pemenang adalah pemain pertama yang mencapai FINISH.</li>
-    </ul>
+      <ul class="text-left text-gray-700 space-y-2">
+        <li>🎯 Jawab soal untuk maju ke kotak berikutnya.</li>
+        <li>✅ Jawaban benar → giliran tetap (boleh lanjut).</li>
+        <li>❌ Jawaban salah / ⏳ waktu habis → giliran pindah.</li>
+        <li>🏁 Pemenang adalah pemain pertama yang mencapai FINISH.</li>
+      </ul>
 
-    <button id="rulesOkBtn"
-            class="mt-6 w-full py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition"
-            onclick="startLevelAfterRules()">
-      Oke, mulai!
-    </button>
+      <button id="rulesOkBtn"
+              class="mt-6 w-full py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition"
+              onclick="startLevelAfterRules()">
+        Oke, mulai!
+      </button>
+    </div>
   </div>
-</div>
 
-  <!-- Main Game Screen -->
   <div id="gameScreen" class="min-h-screen game-board p-4 hidden">
     <div class="max-w-6xl mx-auto">
 
-      <!-- Header -->
       <div class="text-center mb-6">
         <h1 class="text-4xl font-bold text-gray-800 mb-2 drop-shadow-lg">🦶 PERMAINAN TRADISIONAL - SETATAK DIGITAL</h1>
         <p class="text-gray-700">Lompat kotak sambil jawab soal matematika!</p>
         <p id="currentLevelText" class="text-lg font-semibold text-blue-700 mt-2"></p>
       </div>
 
-      <!-- Current Player Info -->
       <div class="glass-effect rounded-2xl p-4 mb-6">
         <div class="flex justify-between items-center flex-wrap gap-4">
           <div class="flex items-center gap-4">
@@ -132,17 +125,14 @@
       </div>
 
       <div class="grid lg:grid-cols-3 gap-6">
-        <!-- Board -->
         <div class="lg:col-span-2">
           <div class="glass-effect rounded-3xl p-6">
             <div class="flex justify-center">
-              <!-- grid papan dibangun via JS -->
               <div id="boardGrid" class="board-grid relative"></div>
             </div>
           </div>
         </div>
 
-        <!-- Sidebar -->
         <div class="space-y-4">
           <div class="glass-effect rounded-2xl p-6">
             <h3 class="text-gray-800 font-bold mb-4 text-center">👥 Status Pemain</h3>
@@ -169,7 +159,6 @@
     </div>
   </div>
 
-  <!-- Math Question Modal -->
   <div id="mathModal" class="fixed inset-0 math-modal hidden items-center justify-center z-50">
     <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 text-center shadow-2xl">
       <div class="mb-6">
@@ -181,14 +170,12 @@
       <div class="flex gap-4 mt-6">
         <button onclick="checkAnswer()" class="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-bold py-4 rounded-2xl transition-all transform hover:scale-105 col-span-2">🦶 Lompat!</button>
       </div>
-      <!-- Efek suara -->
       <audio id="sound-correct" src="sounds/benar.mp3" preload="auto"></audio>
       <audio id="sound-wrong" src="sounds/salah.mp3" preload="auto"></audio>
       <div id="answerFeedback" class="mt-6 text-center font-bold text-lg hidden"></div>
     </div>
   </div>
 
-  <!-- Win Modal -->
   <div id="winModal" class="fixed inset-0 math-modal hidden items-center justify-center z-50">
     <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 text-center shadow-2xl">
       <div class="mb-6">
